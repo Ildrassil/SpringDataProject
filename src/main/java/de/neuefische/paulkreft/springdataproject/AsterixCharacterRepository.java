@@ -11,4 +11,6 @@ public interface AsterixCharacterRepository extends MongoRepository<AsterixChara
 
 //       @Query()
 //       List<AsterixCharacter>findAllByAge(int age);
+
+
 }
