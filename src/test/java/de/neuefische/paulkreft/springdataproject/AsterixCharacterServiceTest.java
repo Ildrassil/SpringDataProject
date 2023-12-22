@@ -6,8 +6,10 @@ import org.mockito.Mockito;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.times;
 
 class AsterixCharacterServiceTest {
 
@@ -23,6 +25,7 @@ class AsterixCharacterServiceTest {
         AsterixCharacterResponse asterixCharacterResponse2 = new AsterixCharacterResponse("Obelix",35,"Steinmetz");
 
         assertEquals(List.of(asterixCharacterResponse,asterixCharacterResponse2),asterixCharacterService.getAllCharacters());
+        System.out.println(Mockito.verify(asterixCharacterRepository, times(1)).findAll());
 
     }
 
@@ -40,6 +43,7 @@ class AsterixCharacterServiceTest {
         AsterixCharacterResponse asterixCharacterResponse = new AsterixCharacterResponse("Asterix",35,"Krieger");
 
         assertEquals(asterixCharacterResponse,asterixCharacterService.getCharacterById(id));
+        System.out.println(Mockito.verify(asterixCharacterRepository, times(1)).findById(id));
     }
 
     @Test
@@ -53,6 +57,7 @@ class AsterixCharacterServiceTest {
         Mockito.when(asterixCharacterRepository.findById(id)).thenReturn(Optional.of(asterixCharacter));
 
         assertEquals(asterixCharacter, asterixCharacterService.deleteCharacterById(id));
+        System.out.println(Mockito.verify(asterixCharacterRepository, times(1)).findById(id));
 
     }
 
@@ -70,6 +75,31 @@ class AsterixCharacterServiceTest {
         Mockito.when(asterixCharacterRepository.save(asterixCharacter)).thenReturn(asterixCharacter);
 
         assertEquals(asterixCharacter,asterixCharacterService.updateCharacterById(id,asterixCharacterResponse));
+
+        System.out.println(Mockito.verify(asterixCharacterRepository, times(1)).save(asterixCharacter));
+        System.out.println(Mockito.verify(asterixCharacterRepository, times(1)).findById(id));
+
+
+    }
+
+    @Test
+    void createCharacterTest(){
+        AsterixCharacterRepository asterixCharacterRepository = Mockito.mock(AsterixCharacterRepository.class);
+        IdService idService = Mockito.mock(IdService.class);
+        AsterixCharacterService asterixCharacterService = new AsterixCharacterService(asterixCharacterRepository,idService);
+        String id = UUID.randomUUID().toString();
+        AsterixCharacterRequest input = new AsterixCharacterRequest("Asterix",35,"Krieger");
+        AsterixCharacter expected = new AsterixCharacter(id,"Asterix",35,"Krieger");
+
+        Mockito.when(asterixCharacterRepository.save(expected)).thenReturn(expected);
+        Mockito.when(idService.randomId()).thenReturn(id);
+
+        assertEquals(expected, asterixCharacterService.createCharacter(input));
+        System.out.println(Mockito.verify(idService,times(1)).randomId());
+        System.out.println(Mockito.verify(asterixCharacterRepository, times(1)).save(expected));
+
+
+
 
     }
 }
